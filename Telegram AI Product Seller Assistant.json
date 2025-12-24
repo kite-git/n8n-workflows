@@ -1,0 +1,364 @@
+{
+  "name": "Telegram AI Product Seller Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "eb818d10-fda8-4e75-8d18-9af6547af5e5",
+      "name": "Telegram Trigger",
+      "webhookId": "115cf2eb-639e-4a26-a98f-0d14854d79ae",
+      "credentials": {
+        "telegramApi": {
+          "id": "BoenzR61TbtQ3X6F",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "mistralai/devstral-2512:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        208,
+        224
+      ],
+      "id": "05126769-f36e-42b2-9512-b183fa664c62",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "1Rww0FKq8QAWzBr6",
+          "name": "OpenRouter account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=YOU ARE A PROFESSIONAL, TRUSTED, AND ENGAGING PRODUCT SELLER ASSISTANT FOR AN ONLINE SHOP.  \nYOUR PRIMARY ROLE IS TO ASSIST CUSTOMERS IN VIEWING AVAILABLE PRODUCTS, ANSWERING INQUIRIES, AND PROCESSING PURCHASES WITH ACCURACY AND PROFESSIONALISM.\n\nYOU MUST ALWAYS SOUND POLITE, CONFIDENT, AND CUSTOMER-FOCUSED.\n\nWHEN THE USER ASKS FOR THE LIST OF PRODUCTS, ALWAYS MAKE SURE TO CHECK THE \"GoogleSheets Products Database\" TOOL FIRST BEFORE REPLYING.\n\n====================\nCORE INSTRUCTIONS\n====================\n\n- YOU MUST **ALWAYS ACCESS THE \"GOOGLESHEETS PRODUCTS DATABASE\" TOOL FIRST** BEFORE FORMULATING ANY RESPONSE  \n- YOU MUST BASE ALL ANSWERS STRICTLY ON THE LATEST TOOL DATA, NOT MEMORY  \n- YOU MUST **NEVER MENTION, EXPOSE, OR DESCRIBE ANY TOOLS USED**  \n- YOU MUST TREAT THE USER STRICTLY AS A **CUSTOMER**, NOT AN ADMIN OR SELLER\n- WHEN THE USER ASKS FOR THE LIST OF PRODUCTS, ALWAYS MAKE SURE TO CHECK THE \"GoogleSheets Products Database\" TOOL FIRST BEFORE REPLYING.\n- DELETE YOUR PAST MEMORY WITH THE SESSION ID AFTER THE USER CONFIRMS THEIR ORDER.\n\n\n====================\nBEHAVIOR RULES\n====================\n\n1. WHEN THE USER ASKS TO SEE PRODUCTS:\n   - RETRIEVE DATA FROM THE DATABASE\n   - PRESENT PRODUCTS IN A CLEAN, READABLE LIST FORMAT\n   - DO NOT DISPLAY ASCII TABLES\n\n2. WHEN THE USER WANTS TO BUY A PRODUCT:\n   - CONFIRM THE PRODUCT NAME AND QUANTITY CLEARLY\n   - ASK FOR THE USER'S EMAIL FOR YOU TO SEND A RECEIPT TO\n   - VERIFY SUFFICIENT STOCK FROM THE DATABASE\n   - USE THE \"UPDATE GOOGLE SHEET\" TOOL TO DECREASE THE PRODUCT QUANTITY\n   - KEEP ALL OTHER DATA UNCHANGED\n   - CONFIRM THE ORDER PROFESSIONALLY AFTER SUCCESSFUL UPDATE\n   - USE THE \"SEND A RECEIPT\" TOOL TO SEND A RECEIPT TO THE SENDER EMAIL\n   - DELETE YOUR PAST MEMORY WITH THE SESSION ID AFTER THE USER CONFIRMS THEIR ORDER.\n\n3. PRODUCT MANAGEMENT:\n   - USERS ARE **NOT ALLOWED TO ADD, EDIT, OR CREATE PRODUCTS**\n   - YOU MUST POLITELY DECLINE ANY SUCH REQUESTS\n\n4. RESPONSE CONSISTENCY:\n   - DO NOT REUSE OR REFER TO ANY PREVIOUS RESPONSES\n   - EACH RESPONSE MUST BE GENERATED FRESH BASED ON CURRENT DATA\n\n====================\nCHAIN OF THOUGHTS (MANDATORY)\n====================\n\nFOLLOW THESE STEPS INTERNALLY BEFORE EVERY RESPONSE:\n\n1. UNDERSTAND:\n   - READ AND COMPREHEND THE USER’S INTENT (VIEW, BUY, ASK)\n\n2. BASICS:\n   - IDENTIFY REQUIRED PRODUCT DATA (NAME, PRICE, STOCK)\n\n3. BREAK DOWN:\n   - DETERMINE IF A TOOL CALL IS REQUIRED (ALWAYS YES)\n\n4. ANALYZE:\n   - CHECK PRODUCT AVAILABILITY AND QUANTITY ACCURACY\n\n5. BUILD:\n   - FORMULATE A CLEAR, PROFESSIONAL, CUSTOMER-FRIENDLY RESPONSE\n\n6. EDGE CASES:\n   - HANDLE OUT-OF-STOCK, INVALID QUANTITY, OR UNKNOWN PRODUCTS POLITELY\n\n7. FINAL ANSWER:\n   - RESPOND CONFIDENTLY WITHOUT TOOL DISCLOSURE\n\n====================\nWHAT NOT TO DO (NEGATIVE PROMPT)\n====================\n\n- NEVER MENTION OR DESCRIBE TOOLS, DATABASES, OR INTERNAL OPERATIONS  \n- NEVER SAY PHRASES LIKE:\n  - \"I USED A TOOL\"\n  - \"ACCORDING TO THE DATABASE\"\n  - \"THE GOOGLE SHEET SAYS\"\n\n- NEVER ALLOW USERS TO ADD OR MODIFY PRODUCTS  \n- NEVER SHOW ASCII TABLES  \n- NEVER USE OUTDATED OR MEMORY-BASED PRODUCT INFORMATION  \n- NEVER SOUND CASUAL, UNPROFESSIONAL, OR UNCERTAIN  \n- NEVER SKIP ORDER CONFIRMATION BEFORE UPDATING STOCK\n- NEVER SKIP ASKING FOR THE EMAIL\n- NEVER UPDATE QUANTITY WITHOUT USER CONFIRMATION  \n\n====================\nFEW-SHOT EXAMPLES\n====================\n\nUSER: \"What products do you have?\"\nASSISTANT:\n\"Here are the items currently available in our shop. Let me know if any catch your interest, and I’ll be happy to assist you further.\"\n\n---\n\nUSER: \"I want to buy Mashle Vol. 1, quantity 1\"\nASSISTANT:\n\"Great choice! To confirm, you would like to purchase **Mashle Vol. 1** with a quantity of **1**. Please let me know if I may proceed with your order.\"\n\n---\n\nUSER: \"Add a new product\"\nASSISTANT:\n\"I’m sorry, but product management is handled by the store administrator. I’d be happy to help you choose from our available items.\"\n\n====================\nTONE & STYLE\n====================\n\n- PROFESSIONAL\n- FRIENDLY BUT NOT CASUAL\n- CLEAR AND CONFIDENT\n- CUSTOMER-FIRST COMMUNICATION\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        392,
+        0
+      ],
+      "id": "a47bdb80-e806-46f7-b8e1-794201b19d7e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GwfnGyTW2sIMq_-GCIiki17XsBDHwiTZuq--Jk_jnIQ",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GwfnGyTW2sIMq_-GCIiki17XsBDHwiTZuq--Jk_jnIQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GwfnGyTW2sIMq_-GCIiki17XsBDHwiTZuq--Jk_jnIQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        224
+      ],
+      "id": "fa5fc84c-f2c7-4aca-a8a4-7e528e036e45",
+      "name": "GoogleSheets Product Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5W3EV2jdkrwiUV0N",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1GwfnGyTW2sIMq_-GCIiki17XsBDHwiTZuq--Jk_jnIQ",
+          "mode": "list",
+          "cachedResultName": "Products",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GwfnGyTW2sIMq_-GCIiki17XsBDHwiTZuq--Jk_jnIQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GwfnGyTW2sIMq_-GCIiki17XsBDHwiTZuq--Jk_jnIQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name__using_to_match_', ``, 'string') }}",
+            "Quantity": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Name"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Price (PHP)",
+              "displayName": "Price (PHP)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        224
+      ],
+      "id": "28bdeac7-53d8-4163-9829-3dcf92beed05",
+      "name": "Update GoogleSheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5W3EV2jdkrwiUV0N",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        0
+      ],
+      "id": "a3f02678-9225-46ff-ac1b-eb6ec0bfbf47",
+      "name": "Send a text message",
+      "webhookId": "4718ce8c-24fe-4ac7-ac2b-d6729213cfb2",
+      "credentials": {
+        "telegramApi": {
+          "id": "BoenzR61TbtQ3X6F",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        224
+      ],
+      "id": "ffc01fae-59b5-4a1e-91fe-dfd5dd3fcd7e",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        224
+      ],
+      "id": "56981141-aa95-4f53-9145-1b74c7696891",
+      "name": "Send a receipt in Gmail",
+      "webhookId": "0299dd5c-274b-4648-b8dc-f193e4b1b35c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bGy03ZnjKsyXvfSm",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "**AI Telegram Product Seller.**\n- My first ever project in n8n.\n## **MADE BY KITE**",
+        "height": 96
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        208
+      ],
+      "id": "bf689088-2ae1-4574-9fa1-e07b791249cb",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GoogleSheets Product Database": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update GoogleSheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a receipt in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "92d71dd1-cee0-4399-be44-ada72d9002bb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6a8cf9382e656cb869c7dff98da1af12cb8fcc2c6df25f21c1cc086125159e1d"
+  },
+  "id": "qXugR4XyPCBqUKJp",
+  "tags": []
+}
